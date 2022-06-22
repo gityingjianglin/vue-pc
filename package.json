@@ -1,5 +1,5 @@
 {
-  "name": "finplatform-pc",
+  "name": "{{name}}",
   "version": "0.0.1",
   "private": true,
   "scripts": {
