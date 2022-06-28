@@ -2,6 +2,10 @@ import store from '@/store/index'
 import config from '@/config/config'
 import { getQueryString } from '@/utils/utils'
 
+let _getKeyWithNamespace = (sourceKey) => {
+  return config.namespace + '_' + sourceKey
+}
+
 /**
    * getRedirectUrl
    * @param {resRedirectUrl} resRedirectUrl  // EUAF平台
@@ -14,20 +18,20 @@ export const getRedirectUrl = (res) => {
   if (process.env.NODE_ENV === 'development') {
     // 开发环境配置本地redirectUrl
     redirectUrl =  encodeURIComponent(`${config.devUserCenterInfo.localUrl}`)
-    localStorage.setItem('redirectUrl', redirectUrl)
+    localStorage.setItem(_getKeyWithNamespace('redirectUrl'), redirectUrl)
   } else {
     // 生产环境获取接口获取redirectUrl, 
     redirectUrl =  encodeURIComponent(res.data.redirectUri + 'index.html')
-    localStorage.setItem('redirectUrl', redirectUrl)
+    localStorage.setItem(_getKeyWithNamespace('redirectUrl'), redirectUrl)
   }
   return redirectUrl
 }
 
 
 export const outLogin = () => {
-  let appClientId = localStorage.getItem('appClientId')
-  let redirectUrl = localStorage.getItem('redirectUrl')
-  let hostName = localStorage.getItem('hostName')
+  let appClientId = localStorage.getItem(_getKeyWithNamespace('appClientId'))
+  let redirectUrl = localStorage.getItem(_getKeyWithNamespace('redirectUrl'))
+  let hostName = localStorage.getItem(_getKeyWithNamespace('hostName'))
   if (redirectUrl && appClientId && hostName) {
     store.dispatch('LogOut').then(res => {
       window.location.href = `${hostName}/?client_id=${appClientId}&redirect_uri=${redirectUrl}#exit`
@@ -37,7 +41,7 @@ export const outLogin = () => {
       let redirectUrl = getRedirectUrl(res)
       let hostName = res.data.ssoUrl
       let appClientId = res.data.clientId
-      console.log(appClientId,localStorage.getItem('appClientId'));
+      console.log(appClientId,localStorage.getItem(_getKeyWithNamespace('appClientId')));
       store.dispatch('LogOut').then(res => {
         window.location.href = `${hostName}/?client_id=${appClientId}&redirect_uri=${redirectUrl}#exit`
       })
@@ -48,9 +52,9 @@ export const outLogin = () => {
 export const checkUserCenterLogin = (next) => {
   let code = getQueryString('code')
   if (!code) {
-    let appClientId = localStorage.getItem('appClientId')
-    let redirectUrl = localStorage.getItem('redirectUrl')
-    let hostName = localStorage.getItem('hostName')
+    let appClientId = localStorage.getItem(_getKeyWithNamespace('appClientId'))
+    let redirectUrl = localStorage.getItem(_getKeyWithNamespace('redirectUrl'))
+    let hostName = localStorage.getItem(_getKeyWithNamespace('hostName'))
     if (redirectUrl && appClientId && hostName) {
       window.location.href = `${hostName}/?client_id=${appClientId}&redirect_uri=${redirectUrl}#exit`
     } else {
@@ -77,3 +81,5 @@ export const checkUserCenterLogin = (next) => {
     })
   }
 }
+
+export const getKeyWithNamespace = _getKeyWithNamespace
