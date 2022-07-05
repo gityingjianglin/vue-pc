@@ -102,6 +102,10 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           commit('SET_PERMISSIONS', [])
+          localStorage.removeItem(getKeyWithNamespace('clientId'))
+          localStorage.removeItem(getKeyWithNamespace('appClientId'))
+          localStorage.removeItem(getKeyWithNamespace('redirectUrl'))
+          localStorage.removeItem(getKeyWithNamespace('hostName'))
           removeToken()
           resolve()
         }).catch(error => {
@@ -129,7 +133,7 @@ const user = {
      * login
      *
      */
-    userCenter({commit,state}) {
+     userCenter({commit,state}) {
       // 调用后端接口（clientId+grantCode(写死 haier_auth)）接口调用成功之后配置集团统一账号中心
       return new Promise((resolve, reject) => {
         // 通过euaf平台clientCode，获取euaf平台clientId
@@ -156,12 +160,19 @@ const user = {
       })
     },
     codeLogin({ commit,state }, data) {
-      debugger
-      return new Promise((resolve, reject) => {
+      return new Promise(async (resolve, reject) => {
         // 使用euaf平台clientId获取集团账户中心access_token
         let clientId = localStorage.getItem(getKeyWithNamespace('clientId'))
+        if (!clientId) {
+          let tempData = await getClientId(config.clientCode)
+          if (tempData.code === 200) {
+            clientId = tempData.data.clientId // euaf平台clientId
+            localStorage.setItem(getKeyWithNamespace('clientId'), clientId)
+          }
+        }
         lodeLogin(clientId, data.code, state.loginType).then(res => {
           let data = res.data
+          localStorage.setItem('userNameInfo',data.user_name)
           setToken(data.access_token)
           commit('SET_TOKEN', data.access_token)
           setExpiresIn(data.expires_in)

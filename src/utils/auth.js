@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
+import config from '@/config/config'
 
-const TokenKey = 'Admin-Token'
+const TokenKey = config.namespace + '_token'
 
 const ExpiresInKey = 'Admin-Expires-In'
 
