@@ -5,10 +5,14 @@ import router from './router'
 import store from './store'
 import filters from './assets/filter/filter.js'
 import element from './uiConfig/elementUi'
+import wlkjUtils from 'wlkj-utils'
 // import ECharts modules manually to reduce bundle size
 
 Vue.use(element)
 Vue.use(plugins)
+Vue.prototype.$wlkjUtils = wlkjUtils
+console.log(wlkjUtils.date.parseTime(1673407269))
+
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
